@@ -231,7 +231,31 @@
             { question: 'O advérbio "talvez" indica:', options: ['Dúvida', 'Certeza', 'Tempo', 'Lugar'], answer: 'Dúvida' },
             { question: 'Em "O cachorro latiu muito", a palavra "muito" é um advérbio de:', options: ['Intensidade', 'Modo', 'Lugar', 'Tempo'], answer: 'Intensidade' },
             { question: 'Qual frase contém um advérbio de modo?', options: ['A menina andava devagar.', 'O sol brilha hoje.', 'O livro está aqui.', 'Eu comi pouco.'], answer: 'A menina andava devagar.' },
-            { question: '"Ele certamente virá." A palavra "certamente" é um advérbio de:', options: ['Afirmação', 'Negação', 'Dúvida', 'Modo'], answer: 'Afirmação' }
+            { question: '"Ele certamente virá." A palavra "certamente" é um advérbio de:', options: ['Afirmação', 'Negação', 'Dúvida', 'Modo'], answer: 'Afirmação' },
+            { question: 'Na frase "O gato está debaixo da mesa", qual palavra indica lugar?', options: ['debaixo', 'gato', 'mesa', 'está'], answer: 'debaixo' },
+            { question: '"Jamais farei isso novamente." A palavra "jamais" é um advérbio de:', options: ['Negação', 'Tempo', 'Modo', 'Dúvida'], answer: 'Negação' },
+            { question: 'Qual advérbio completa a frase "Ele correu __________ para pegar o ônibus"?', options: ['rapidamente', 'ontem', 'pouco', 'ali'], answer: 'rapidamente' },
+            { question: 'Em "A flor é tão bonita", qual palavra é um advérbio de intensidade?', options: ['tão', 'flor', 'bonita', 'é'], answer: 'tão' },
+            { question: 'O advérbio "aqui" se refere a:', options: ['Lugar', 'Tempo', 'Modo', 'Afirmação'], answer: 'Lugar' },
+            { question: '"Provavelmente choverá amanhã." Qual palavra indica dúvida?', options: ['Provavelmente', 'choverá', 'amanhã', '.'], answer: 'Provavelmente' },
+            { question: 'Na frase "Fale mais alto, por favor", o advérbio "mais" indica:', options: ['Intensidade', 'Modo', 'Lugar', 'Tempo'], answer: 'Intensidade' },
+            { question: '"Realmente gostei do filme." A palavra "Realmente" é um advérbio de:', options: ['Afirmação', 'Negação', 'Modo', 'Dúvida'], answer: 'Afirmação' },
+            { question: 'Qual das opções é um advérbio de tempo?', options: ['Agora', 'Mal', 'Perto', 'Menos'], answer: 'Agora' },
+            { question: 'Em "A tartaruga anda vagarosamente", qual palavra indica o modo como ela anda?', options: ['vagarosamente', 'tartaruga', 'anda', 'A'], answer: 'vagarosamente' },
+            { question: '"O livro está aí, na sua frente." Qual palavra é um advérbio de lugar?', options: ['aí', 'livro', 'frente', 'sua'], answer: 'aí' },
+            { question: 'Qual advérbio de negação podemos usar na frase "Eu ____ vou à festa"?', options: ['não', 'sim', 'talvez', 'bem'], answer: 'não' },
+            { question: '"Ela estava bastante feliz." A palavra "bastante" indica:', options: ['Intensidade', 'Modo', 'Tempo', 'Lugar'], answer: 'Intensidade' },
+            { question: 'Na frase "Antigamente, as cartas demoravam para chegar", qual é o advérbio de tempo?', options: ['Antigamente', 'cartas', 'demoravam', 'chegar'], answer: 'Antigamente' },
+            { question: 'Qual frase usa um advérbio de modo?', options: ['Ele agiu calmamente.', 'Eu moro longe.', 'Nós sairemos breve.', 'Talvez eu vá.'], answer: 'Ele agiu calmamente.' },
+            { question: '"O avião voa acima das nuvens." O advérbio "acima" é de:', options: ['Lugar', 'Modo', 'Tempo', 'Intensidade'], answer: 'Lugar' },
+            { question: 'Qual palavra indica afirmação?', options: ['Sim', 'Não', 'Acaso', 'Mal'], answer: 'Sim' },
+            { question: 'Em "A comida estava meio salgada", "meio" é um advérbio de:', options: ['Intensidade', 'Dúvida', 'Modo', 'Lugar'], answer: 'Intensidade' },
+            { question: 'Na frase "Hoje não vou sair", qual palavra é o advérbio de tempo?', options: ['Hoje', 'não', 'vou', 'sair'], answer: 'Hoje' },
+            { question: 'Qual das alternativas contém um advérbio de dúvida?', options: ['Quiçá', 'Sempre', 'Dentro', 'Assim'], answer: 'Quiçá' },
+            { question: '"O cachorro está fora da casa." O advérbio "fora" indica:', options: ['Lugar', 'Tempo', 'Negação', 'Modo'], answer: 'Lugar' },
+            { question: 'Na frase "Ele fala pouco", a palavra "pouco" é um advérbio de:', options: ['Intensidade', 'Modo', 'Tempo', 'Negação'], answer: 'Intensidade' },
+            { question: 'Qual advérbio completa a frase "Eu moro ________ da escola"?', options: ['perto', 'bem', 'nunca', 'demais'], answer: 'perto' },
+            { question: '"Ele chegou depois da hora." A palavra "depois" é um advérbio de:', options: ['Tempo', 'Lugar', 'Modo', 'Afirmação'], answer: 'Tempo' }
         ];
 
         // --- FUNÇÕES GERAIS E DE TELA ---
@@ -338,7 +362,6 @@
             registerMessage.textContent = '';
         });
         
-        // Event listeners for Enter key
         loginPasswordInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') loginButton.click(); });
         loginCodeInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') loginButton.click(); });
         registerPasswordInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') registerButton.click(); });
@@ -451,9 +474,10 @@
         }
 
         function displayNextQuestion() {
+            // Se acabar as perguntas, embaralha de novo e continua
             if (currentQuestionIndex >= shuffledQuestions.length) {
-                endGame();
-                return;
+                currentQuestionIndex = 0;
+                shuffledQuestions = shuffleArray([...questions]);
             }
 
             const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -488,7 +512,9 @@
                 e.target.classList.remove('bg-white', 'border-sky-300');
                 e.target.classList.add('bg-red-400', 'border-red-600', 'text-white');
                  if (lives <= 0) {
+                    // Atraso para o jogador ver o feedback antes da tela final
                     setTimeout(endGame, 1500);
+                    updateLivesDisplay(); // Atualiza para mostrar 0 vidas
                     return;
                 }
             }
