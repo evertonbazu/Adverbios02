@@ -385,6 +385,7 @@
         let player;
         let progressCheckInterval;
         let maxWatchedTime = 0;
+        let videoRulesBroken = false; // Flag to check for mute/speed changes
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
@@ -394,7 +395,10 @@
             });
         }
 
-        function onPlayerReady(event) { maxWatchedTime = 0; }
+        function onPlayerReady(event) {
+            maxWatchedTime = 0;
+            videoRulesBroken = false; // Reset flag when video is ready
+        }
 
         function onPlayerStateChange(event) {
             if (event.data == YT.PlayerState.PLAYING) {
@@ -412,7 +416,13 @@
                         maxWatchedTime = currentTime;
                     }
                     
+                    // If rules are broken at any point, set the flag permanently for this session
                     if (isMuted || playbackRate !== 1) {
+                        videoRulesBroken = true;
+                    }
+
+                    // Only calculate score if rules were never broken
+                    if (videoRulesBroken) {
                         score = 0;
                         scoreTextEl.classList.add('text-red-500');
                     } else {
@@ -549,7 +559,7 @@
         
         function getMotivationalMessage(finalScore) {
             if (finalScore >= 1000) {
-                return "Excelente, " + loggedInUser.firstName + "! Você é um mestre dos advérbios! 🏆";
+                return "Excelente, " + loggedInUser.firstName + "! Você é um mestre dos advérbios! �";
             } else if (finalScore >= 500) {
                 return "Muito bem, " + loggedInUser.firstName + "! Continue praticando para ficar ainda melhor. 👍";
             } else {
@@ -609,3 +619,4 @@
     </script>
 </body>
 </html>
+�
