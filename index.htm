@@ -65,7 +65,6 @@
         .heart {
             color: red;
             font-size: 2rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -84,7 +83,10 @@
                     <div class="loader hidden ml-3"></div>
                 </button>
                 <p id="login-message" class="text-red-500 mt-4 h-5"></p>
-                <button id="go-to-register" class="mt-2 text-sky-600 hover:underline">Não tenho cadastro</button>
+                <div class="flex space-x-2 mt-2">
+                    <button id="go-to-register" class="w-1/2 text-sky-600 hover:underline">Não tenho cadastro</button>
+                    <button id="view-ranking-button" class="w-1/2 text-sky-600 hover:underline">Ver Ranking</button>
+                </div>
             </div>
             <div id="register-form" class="hidden">
                 <h1 class="text-3xl sm:text-4xl font-bold text-sky-800">Criar Cadastro</h1>
@@ -121,11 +123,11 @@
             <button id="continue-btn" class="mt-8 w-full bg-green-500 text-white text-2xl sm:text-3xl font-bold py-3 sm:py-4 rounded-xl shadow-lg transition transform hover:scale-105 opacity-50 cursor-not-allowed" disabled>
                 Ir para o Jogo!
             </button>
-            <button id="skip-video-btn" class="mt-4 text-sky-700 font-semibold hover:underline">Pular vídeo e começar com 0 pontos</button>
+            <button id="skip-video-btn" class="mt-2 text-gray-500 hover:text-gray-700 hover:underline">Pular vídeo (não ganha pontos)</button>
         </div>
     </div>
 
-    <!-- Tela do Jogo -->
+    <!-- Tela do Jogo (Quiz) -->
     <div id="game-screen" class="screen hidden w-full max-w-4xl mx-auto flex-col items-center justify-center">
         <header class="text-center mb-4 sm:mb-8 w-full">
             <div class="flex justify-between items-center w-full">
@@ -137,13 +139,14 @@
             <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mt-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
                 Quiz dos Advérbios
             </h1>
+             <p class="text-lg sm:text-xl text-white mt-2">Olá, <span id="player-firstname"></span>! Escolha a resposta certa.</p>
         </header>
         <main class="w-full bg-white/70 p-6 sm:p-8 rounded-2xl shadow-xl text-center">
             <div id="question-container" class="mb-6 sm:mb-8 text-xl sm:text-2xl md:text-3xl font-semibold text-sky-800 min-h-[6rem] flex items-center justify-center">
-                <!-- Question will be inserted here -->
+                <!-- A pergunta aparecerá aqui -->
             </div>
             <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <!-- Options will be inserted here -->
+                <!-- As opções aparecerão aqui -->
             </div>
         </main>
     </div>
@@ -151,11 +154,13 @@
     <!-- Tela Final (Game Over) -->
     <div id="end-screen" class="screen hidden flex items-center justify-center">
         <div class="bg-white/70 p-6 sm:p-8 rounded-2xl shadow-xl max-w-3xl w-full text-center">
-            <h1 class="text-3xl sm:text-4xl font-bold text-sky-800">Fim de Jogo!</h1>
-            <p id="final-message" class="text-lg text-sky-800 mt-4 font-semibold"></p>
-            <div class="flex justify-around items-center my-6 text-sky-700">
-                <div class="text-xl"><strong>Pontos:</strong> <span id="final-score">0</span></div>
-                <div class="text-xl"><strong>Tempo:</strong> <span id="final-time">0s</span></div>
+            <div id="end-screen-content">
+                <h1 class="text-3xl sm:text-4xl font-bold text-sky-800">Fim de Jogo!</h1>
+                <p id="final-message" class="text-lg text-sky-800 mt-4 font-semibold"></p>
+                <div class="flex justify-around items-center my-6 text-sky-700">
+                    <div class="text-xl"><strong>Pontos:</strong> <span id="final-score">0</span></div>
+                    <div class="text-xl"><strong>Tempo:</strong> <span id="final-time">0s</span></div>
+                </div>
             </div>
             <h2 class="text-2xl sm:text-3xl font-bold text-sky-800 mt-6 mb-4">Ranking (Top 100)</h2>
             <div class="overflow-y-auto h-64 bg-white/50 rounded-lg">
@@ -176,16 +181,18 @@
             <button id="play-again-button" class="mt-8 w-full bg-yellow-500 text-white text-2xl sm:text-3xl font-bold py-3 rounded-xl shadow-lg hover:bg-yellow-600 transition">
                 Jogar Novamente
             </button>
+            <button id="back-from-ranking-button" class="mt-8 w-full bg-gray-500 text-white text-2xl sm:text-3xl font-bold py-3 rounded-xl shadow-lg hover:bg-gray-600 transition hidden">
+                Voltar
+            </button>
         </div>
     </div>
 
-    <div id="feedback" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 sm:p-8 rounded-2xl text-white text-2xl sm:text-3xl font-bold shadow-2xl opacity-0 pointer-events-none w-11/12 max-w-sm text-center"></div>
+    <div id="feedback" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 sm:p-8 rounded-2xl text-white text-2xl font-bold shadow-2xl opacity-0 pointer-events-none w-11/12 max-w-sm text-center"></div>
     
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        // --- CONFIGURAÇÃO ---
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvzdtou17UCu8lmOFg9fxVEaLg1FnWcvexCYUZzqNLcUhiE6mZW_OkxeeI874AXZRT/exec';
-        const NOME_DESTE_JOGO = "Quiz dos Advérbios"; // Nome do jogo para o ranking
+        const NOME_DESTE_JOGO = "Quiz dos Advérbios";
 
         // --- ELEMENTOS DO DOM ---
         const loginScreen = document.getElementById('login-screen');
@@ -209,16 +216,22 @@
         const registerMessage = document.getElementById('register-message');
         const backToLoginButton = document.getElementById('back-to-login');
         const livesContainer = document.getElementById('lives-container');
+        const playerFirstNameEl = document.getElementById('player-firstname');
+        const finalMessageEl = document.getElementById('final-message');
+        const viewRankingButton = document.getElementById('view-ranking-button');
+        const backFromRankingButton = document.getElementById('back-from-ranking-button');
+        const playAgainButton = document.getElementById('play-again-button');
+        const endScreenContent = document.getElementById('end-screen-content');
         const questionContainer = document.getElementById('question-container');
         const optionsContainer = document.getElementById('options-container');
         const feedbackEl = document.getElementById('feedback');
-        const finalMessageEl = document.getElementById('final-message');
-        
+
         // --- ESTADO DO JOGO ---
         let score = 0;
         let lives = 5;
         let startTime;
         let loggedInUser = null;
+        let videoPointsInvalidated = false;
         let currentQuestionIndex = 0;
         let shuffledQuestions = [];
 
@@ -289,10 +302,10 @@
                 return await response.json();
             } catch (error) {
                 console.error("Erro ao contatar o Apps Script:", error);
-                return { status: 'error', message: 'Falha de comunicação. Verifique sua conexão.' };
+                return { status: 'error', message: 'Falha de comunicação. Verifique a publicação do script e sua conexão.' };
             }
         }
-
+        
         function capitalizeName(name) {
             return name.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         }
@@ -301,6 +314,7 @@
             const firstName = userData.name.split(' ')[0];
             loggedInUser = { ...userData, firstName };
             sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            playerFirstNameEl.textContent = firstName;
             showScreen(videoScreen);
         }
 
@@ -363,7 +377,7 @@
             loginForm.classList.remove('hidden');
             registerMessage.textContent = '';
         });
-        
+
         loginPasswordInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') loginButton.click(); });
         loginCodeInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') loginButton.click(); });
         registerPasswordInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') registerButton.click(); });
@@ -374,22 +388,35 @@
             const user = sessionStorage.getItem('loggedInUser');
             if (user) {
                 loggedInUser = JSON.parse(user);
+                playerFirstNameEl.textContent = loggedInUser.firstName;
                 showScreen(videoScreen);
             } else {
                 showScreen(loginScreen);
             }
             updateScoreDisplay();
         });
-
+        
         // --- LÓGICA DO VÍDEO ---
         let player;
         let progressCheckInterval;
         let maxWatchedTime = 0;
-        let videoRulesBroken = false; // Flag to check for mute/speed changes
+
+        function updateScoreDisplay() {
+            document.querySelectorAll('.score-display').forEach(el => el.textContent = score);
+        }
+        
+        function updateLivesDisplay() {
+            livesContainer.innerHTML = '';
+            for (let i = 0; i < lives; i++) {
+                livesContainer.innerHTML += '<span class="heart">❤️</span>';
+            }
+        }
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                height: '100%', width: '100%', videoId: '3qXiMxTuDq8',
+                height: '100%',
+                width: '100%',
+                videoId: '3qXiMxTuDq8',
                 playerVars: { 'playsinline': 1, 'rel': 0, 'controls': 1 },
                 events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
             });
@@ -397,7 +424,7 @@
 
         function onPlayerReady(event) {
             maxWatchedTime = 0;
-            videoRulesBroken = false; // Reset flag when video is ready
+            videoPointsInvalidated = false;
         }
 
         function onPlayerStateChange(event) {
@@ -416,21 +443,17 @@
                         maxWatchedTime = currentTime;
                     }
                     
-                    // If rules are broken at any point, set the flag permanently for this session
                     if (isMuted || playbackRate !== 1) {
-                        videoRulesBroken = true;
+                        videoPointsInvalidated = true;
                     }
 
-                    // Only calculate score if rules were never broken
-                    if (videoRulesBroken) {
+                    if(videoPointsInvalidated) {
                         score = 0;
                         scoreTextEl.classList.add('text-red-500');
-                    } else {
+                    } else if (duration > 0) {
+                        const potentialScore = (maxWatchedTime / duration) * 1000;
+                        score = Math.floor(potentialScore / 10) * 10;
                         scoreTextEl.classList.remove('text-red-500');
-                        if (duration > 0) {
-                            const potentialScore = (maxWatchedTime / duration) * 1000;
-                            score = Math.floor(potentialScore / 10) * 10;
-                        }
                     }
                     updateScoreDisplay();
 
@@ -459,18 +482,6 @@
             showScreen(gameScreen);
             startGame();
         });
-
-        // --- FUNÇÕES DE UI DO JOGO ---
-        function updateScoreDisplay() {
-            document.querySelectorAll('.score-display').forEach(el => el.textContent = score);
-        }
-        
-        function updateLivesDisplay() {
-            livesContainer.innerHTML = '';
-            for (let i = 0; i < lives; i++) {
-                livesContainer.innerHTML += '<span class="heart">❤️</span>';
-            }
-        }
 
         // --- LÓGICA DO QUIZ ---
         function shuffleArray(array) {
@@ -533,7 +544,7 @@
                 e.target.classList.remove('bg-white', 'border-sky-300');
                 e.target.classList.add('bg-red-400', 'border-red-600', 'text-white');
                  if (lives <= 0) {
-                    setTimeout(endGame, 1500);
+                    setTimeout(endGame, 2500);
                     updateLivesDisplay();
                     return;
                 }
@@ -543,44 +554,45 @@
             updateLivesDisplay();
             currentQuestionIndex++;
             
-            setTimeout(displayNextQuestion, 1500);
+            setTimeout(displayNextQuestion, 2500);
         }
 
         function showFeedback(message, explanation, isCorrect) {
-            feedbackEl.innerHTML = `<strong>${message}</strong><br><span class="text-lg sm:text-xl font-normal mt-2 block">${explanation}</span>`;
-            feedbackEl.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 sm:p-8 rounded-2xl text-white text-2xl sm:text-3xl font-bold shadow-2xl opacity-0 pointer-events-none w-11/12 max-w-sm text-center ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`;
+            feedbackEl.innerHTML = `<strong class="block text-3xl">${message}</strong><span class="text-xl mt-2 block">${explanation}</span>`;
+            feedbackEl.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 sm:p-8 rounded-2xl text-white font-bold shadow-2xl opacity-0 pointer-events-none w-11/12 max-w-sm text-center ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`;
             feedbackEl.classList.remove('opacity-0');
             feedbackEl.style.transform = 'translate(-50%, -50%) scale(1)';
             setTimeout(() => {
                 feedbackEl.style.transform = 'translate(-50%, -50%) scale(0.5)';
                 feedbackEl.classList.add('opacity-0');
-            }, 2500); // Aumentei o tempo para dar tempo de ler a explicação
+            }, 2400);
         }
         
         function getMotivationalMessage(finalScore) {
-            if (finalScore >= 1000) {
-                return "Excelente, " + loggedInUser.firstName + "! Você é um mestre dos advérbios! �";
-            } else if (finalScore >= 500) {
+            if (finalScore >= 1100) {
+                return "Excelente, " + loggedInUser.firstName + "! Você é um mestre dos advérbios! 🏆";
+            } else if (finalScore >= 700) {
                 return "Muito bem, " + loggedInUser.firstName + "! Continue praticando para ficar ainda melhor. 👍";
             } else {
                 return "Não desista, " + loggedInUser.firstName + "! Cada tentativa é um passo para aprender mais. ✨";
             }
         }
-
+        
         // --- LÓGICA DE FIM DE JOGO E RANKING ---
         async function endGame() {
             const endTime = new Date();
             const timeSpent = Math.round((endTime - startTime) / 1000);
             
             showScreen(endScreen);
+            endScreenContent.classList.remove('hidden');
+            playAgainButton.classList.remove('hidden');
+            backFromRankingButton.classList.add('hidden');
             document.getElementById('final-score').textContent = score;
             document.getElementById('final-time').textContent = `${timeSpent}s`;
             finalMessageEl.textContent = getMotivationalMessage(score);
             
-            document.getElementById('ranking-body').innerHTML = `<tr><td colspan="4" class="p-8 text-center"><div class="loader mx-auto"></div></td></tr>`;
-
             const result = await callAppsScript('saveScoreAndGetRanking', { 
-                fullName: loggedInUser.name,
+                fullName: loggedInUser.name, 
                 turma: loggedInUser.turma, 
                 score: score, 
                 time: timeSpent,
@@ -595,11 +607,35 @@
             }
         }
         
+        async function displayRanking() {
+            showScreen(endScreen);
+            endScreenContent.classList.add('hidden');
+            playAgainButton.classList.add('hidden');
+            backFromRankingButton.classList.remove('hidden');
+
+            const result = await callAppsScript('getRanking', { nomeDoJogo: NOME_DESTE_JOGO });
+            if (result.status === 'success') {
+                populateRankingTable(result.ranking);
+            } else {
+                document.getElementById('ranking-body').innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">${result.message}</td></tr>`;
+            }
+        }
+
+        viewRankingButton.addEventListener('click', displayRanking);
+        
+        backFromRankingButton.addEventListener('click', () => {
+            showScreen(loginScreen);
+        });
+
         function populateRankingTable(ranking) {
             const tbody = document.getElementById('ranking-body');
             tbody.innerHTML = '';
+            if(ranking.length === 0){
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center">Ainda não há pontuações. Seja o primeiro!</td></tr>`;
+                return;
+            }
             ranking.forEach((entry, index) => {
-                const isCurrentUser = entry.code === loggedInUser.code;
+                const isCurrentUser = loggedInUser && entry.code === loggedInUser.code;
                 const row = `
                     <tr class="border-b border-sky-100 ${isCurrentUser ? 'bg-yellow-200' : ''}">
                         <td class="p-2 font-bold">${index + 1}</td>
@@ -612,11 +648,10 @@
             });
         }
 
-        document.getElementById('play-again-button').addEventListener('click', () => {
+        playAgainButton.addEventListener('click', () => {
             window.location.reload();
         });
 
     </script>
 </body>
 </html>
-�
