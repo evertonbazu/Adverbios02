@@ -133,6 +133,9 @@
             <div class="flex justify-between items-center w-full">
                 <div id="lives-container" class="flex space-x-1"></div>
                 <div class="bg-white/50 rounded-full px-4 sm:px-6 py-2">
+                    <span class="text-xl sm:text-2xl font-semibold text-sky-800">Tempo: <span id="timer-display">02:30</span></span>
+                </div>
+                <div class="bg-white/50 rounded-full px-4 sm:px-6 py-2">
                     <span class="text-xl sm:text-2xl font-semibold text-sky-800">Pontos: <span class="score-display">0</span></span>
                 </div>
             </div>
@@ -157,6 +160,7 @@
             <div id="end-screen-content">
                 <h1 class="text-3xl sm:text-4xl font-bold text-sky-800">Fim de Jogo!</h1>
                 <p id="final-message" class="text-lg text-sky-800 mt-4 font-semibold"></p>
+                <p id="bonus-message" class="text-lg text-green-600 mt-2 font-semibold"></p>
                 <div class="flex justify-around items-center my-6 text-sky-700">
                     <div class="text-xl"><strong>Pontos:</strong> <span id="final-score">0</span></div>
                     <div class="text-xl"><strong>Tempo:</strong> <span id="final-time">0s</span></div>
@@ -225,6 +229,8 @@
         const questionContainer = document.getElementById('question-container');
         const optionsContainer = document.getElementById('options-container');
         const feedbackEl = document.getElementById('feedback');
+        const timerDisplay = document.getElementById('timer-display');
+        const bonusMessageEl = document.getElementById('bonus-message');
 
         // --- ESTADO DO JOGO ---
         let score = 0;
@@ -234,6 +240,7 @@
         let videoPointsInvalidated = false;
         let currentQuestionIndex = 0;
         let shuffledQuestions = [];
+        let timerInterval = null;
 
         // --- BANCO DE PERGUNTAS COM EXPLICAÇÕES ---
         const questions = [
@@ -484,6 +491,13 @@
         });
 
         // --- LÓGICA DO QUIZ ---
+        function updateTimerDisplay(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            const formattedTime = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+            timerDisplay.textContent = formattedTime;
+        }
+
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -500,6 +514,19 @@
             startTime = new Date();
             updateLivesDisplay();
             updateScoreDisplay();
+            
+            // Iniciar timer
+            clearInterval(timerInterval);
+            let timeLeft = 150; // 2 minutos e 30 segundos
+            updateTimerDisplay(timeLeft);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(timeLeft);
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
             displayNextQuestion();
         }
 
@@ -580,6 +607,16 @@
         
         // --- LÓGICA DE FIM DE JOGO E RANKING ---
         async function endGame() {
+            clearInterval(timerInterval); // Para o cronômetro
+
+            const bonus = lives > 0 ? lives * 100 : 0;
+            if (bonus > 0) {
+                bonusMessageEl.textContent = `+${bonus} pontos de bônus por ${lives} vida(s) restante(s)!`;
+            } else {
+                bonusMessageEl.textContent = '';
+            }
+            score += bonus;
+
             const endTime = new Date();
             const timeSpent = Math.round((endTime - startTime) / 1000);
             
