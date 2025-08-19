@@ -111,7 +111,7 @@
     <div id="video-screen" class="screen hidden flex items-center justify-center">
         <div class="bg-white/70 p-6 sm:p-8 rounded-2xl shadow-xl max-w-3xl w-full text-center">
             <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-sky-800">Vamos aprender!</h2>
-            <p class="text-base sm:text-lg text-sky-700 mt-2 mb-2">Assista ao vídeo para revisar e ganhar até 200 pontos!</p>
+            <p class="text-base sm:text-lg text-sky-700 mt-2 mb-2">Assista ao vídeo para revisar e ganhar até 1000 pontos!</p>
             <div class="mb-4 bg-white/50 rounded-full px-6 py-2 inline-block">
                 <span class="text-2xl font-semibold text-sky-800">Pontos: <span class="score-display">0</span></span>
             </div>
@@ -121,6 +121,7 @@
             <button id="continue-btn" class="mt-8 w-full bg-green-500 text-white text-2xl sm:text-3xl font-bold py-3 sm:py-4 rounded-xl shadow-lg transition transform hover:scale-105 opacity-50 cursor-not-allowed" disabled>
                 Ir para o Jogo!
             </button>
+            <button id="skip-video-btn" class="mt-4 text-sky-700 font-semibold hover:underline">Pular vídeo e começar com 0 pontos</button>
         </div>
     </div>
 
@@ -192,6 +193,7 @@
         const gameScreen = document.getElementById('game-screen');
         const endScreen = document.getElementById('end-screen');
         const continueBtn = document.getElementById('continue-btn');
+        const skipVideoBtn = document.getElementById('skip-video-btn');
         const loginForm = document.getElementById('login-form');
         const loginCodeInput = document.getElementById('login-code');
         const loginPasswordInput = document.getElementById('login-password');
@@ -220,42 +222,42 @@
         let currentQuestionIndex = 0;
         let shuffledQuestions = [];
 
-        // --- BANCO DE PERGUNTAS ---
+        // --- BANCO DE PERGUNTAS COM EXPLICAÇÕES ---
         const questions = [
-            { question: 'Na frase "O menino chegou cedo", a palavra em destaque é um advérbio de:', options: ['Tempo', 'Lugar', 'Modo', 'Intensidade'], answer: 'Tempo' },
-            { question: 'Qual das palavras abaixo é um advérbio de lugar?', options: ['Lá', 'Bem', 'Muito', 'Amanhã'], answer: 'Lá' },
-            { question: 'Na frase "Ela canta bem", a palavra "bem" classifica-se como advérbio de:', options: ['Modo', 'Negação', 'Dúvida', 'Tempo'], answer: 'Modo' },
-            { question: '"Comi demais no almoço." O advérbio em destaque indica:', options: ['Intensidade', 'Afirmação', 'Lugar', 'Modo'], answer: 'Intensidade' },
-            { question: 'Qual palavra é um advérbio de negação?', options: ['Não', 'Sim', 'Talvez', 'Aqui'], answer: 'Não' },
-            { question: 'Na frase "Eu sempre estudo antes das provas", qual é o advérbio?', options: ['sempre', 'estudo', 'provas', 'antes'], answer: 'sempre' },
-            { question: 'O advérbio "talvez" indica:', options: ['Dúvida', 'Certeza', 'Tempo', 'Lugar'], answer: 'Dúvida' },
-            { question: 'Em "O cachorro latiu muito", a palavra "muito" é um advérbio de:', options: ['Intensidade', 'Modo', 'Lugar', 'Tempo'], answer: 'Intensidade' },
-            { question: 'Qual frase contém um advérbio de modo?', options: ['A menina andava devagar.', 'O sol brilha hoje.', 'O livro está aqui.', 'Eu comi pouco.'], answer: 'A menina andava devagar.' },
-            { question: '"Ele certamente virá." A palavra "certamente" é um advérbio de:', options: ['Afirmação', 'Negação', 'Dúvida', 'Modo'], answer: 'Afirmação' },
-            { question: 'Na frase "O gato está debaixo da mesa", qual palavra indica lugar?', options: ['debaixo', 'gato', 'mesa', 'está'], answer: 'debaixo' },
-            { question: '"Jamais farei isso novamente." A palavra "jamais" é um advérbio de:', options: ['Negação', 'Tempo', 'Modo', 'Dúvida'], answer: 'Negação' },
-            { question: 'Qual advérbio completa a frase "Ele correu __________ para pegar o ônibus"?', options: ['rapidamente', 'ontem', 'pouco', 'ali'], answer: 'rapidamente' },
-            { question: 'Em "A flor é tão bonita", qual palavra é um advérbio de intensidade?', options: ['tão', 'flor', 'bonita', 'é'], answer: 'tão' },
-            { question: 'O advérbio "aqui" se refere a:', options: ['Lugar', 'Tempo', 'Modo', 'Afirmação'], answer: 'Lugar' },
-            { question: '"Provavelmente choverá amanhã." Qual palavra indica dúvida?', options: ['Provavelmente', 'choverá', 'amanhã', '.'], answer: 'Provavelmente' },
-            { question: 'Na frase "Fale mais alto, por favor", o advérbio "mais" indica:', options: ['Intensidade', 'Modo', 'Lugar', 'Tempo'], answer: 'Intensidade' },
-            { question: '"Realmente gostei do filme." A palavra "Realmente" é um advérbio de:', options: ['Afirmação', 'Negação', 'Modo', 'Dúvida'], answer: 'Afirmação' },
-            { question: 'Qual das opções é um advérbio de tempo?', options: ['Agora', 'Mal', 'Perto', 'Menos'], answer: 'Agora' },
-            { question: 'Em "A tartaruga anda vagarosamente", qual palavra indica o modo como ela anda?', options: ['vagarosamente', 'tartaruga', 'anda', 'A'], answer: 'vagarosamente' },
-            { question: '"O livro está aí, na sua frente." Qual palavra é um advérbio de lugar?', options: ['aí', 'livro', 'frente', 'sua'], answer: 'aí' },
-            { question: 'Qual advérbio de negação podemos usar na frase "Eu ____ vou à festa"?', options: ['não', 'sim', 'talvez', 'bem'], answer: 'não' },
-            { question: '"Ela estava bastante feliz." A palavra "bastante" indica:', options: ['Intensidade', 'Modo', 'Tempo', 'Lugar'], answer: 'Intensidade' },
-            { question: 'Na frase "Antigamente, as cartas demoravam para chegar", qual é o advérbio de tempo?', options: ['Antigamente', 'cartas', 'demoravam', 'chegar'], answer: 'Antigamente' },
-            { question: 'Qual frase usa um advérbio de modo?', options: ['Ele agiu calmamente.', 'Eu moro longe.', 'Nós sairemos breve.', 'Talvez eu vá.'], answer: 'Ele agiu calmamente.' },
-            { question: '"O avião voa acima das nuvens." O advérbio "acima" é de:', options: ['Lugar', 'Modo', 'Tempo', 'Intensidade'], answer: 'Lugar' },
-            { question: 'Qual palavra indica afirmação?', options: ['Sim', 'Não', 'Acaso', 'Mal'], answer: 'Sim' },
-            { question: 'Em "A comida estava meio salgada", "meio" é um advérbio de:', options: ['Intensidade', 'Dúvida', 'Modo', 'Lugar'], answer: 'Intensidade' },
-            { question: 'Na frase "Hoje não vou sair", qual palavra é o advérbio de tempo?', options: ['Hoje', 'não', 'vou', 'sair'], answer: 'Hoje' },
-            { question: 'Qual das alternativas contém um advérbio de dúvida?', options: ['Quiçá', 'Sempre', 'Dentro', 'Assim'], answer: 'Quiçá' },
-            { question: '"O cachorro está fora da casa." O advérbio "fora" indica:', options: ['Lugar', 'Tempo', 'Negação', 'Modo'], answer: 'Lugar' },
-            { question: 'Na frase "Ele fala pouco", a palavra "pouco" é um advérbio de:', options: ['Intensidade', 'Modo', 'Tempo', 'Negação'], answer: 'Intensidade' },
-            { question: 'Qual advérbio completa a frase "Eu moro ________ da escola"?', options: ['perto', 'bem', 'nunca', 'demais'], answer: 'perto' },
-            { question: '"Ele chegou depois da hora." A palavra "depois" é um advérbio de:', options: ['Tempo', 'Lugar', 'Modo', 'Afirmação'], answer: 'Tempo' }
+            { question: 'Na frase "O menino chegou cedo", a palavra em destaque é um advérbio de:', options: ['Tempo', 'Lugar', 'Modo', 'Intensidade'], answer: 'Tempo', explanation: '"Cedo" indica QUANDO a ação aconteceu, por isso é um advérbio de tempo.' },
+            { question: 'Qual das palavras abaixo é um advérbio de lugar?', options: ['Lá', 'Bem', 'Muito', 'Amanhã'], answer: 'Lá', explanation: '"Lá" indica ONDE algo está, sendo um advérbio de lugar.' },
+            { question: 'Na frase "Ela canta bem", a palavra "bem" classifica-se como advérbio de:', options: ['Modo', 'Negação', 'Dúvida', 'Tempo'], answer: 'Modo', explanation: '"Bem" indica o MODO como ela canta, a maneira como a ação é feita.' },
+            { question: '"Comi demais no almoço." O advérbio em destaque indica:', options: ['Intensidade', 'Afirmação', 'Lugar', 'Modo'], answer: 'Intensidade', explanation: '"Demais" intensifica a ação de comer, mostrando a QUANTIDADE.' },
+            { question: 'Qual palavra é um advérbio de negação?', options: ['Não', 'Sim', 'Talvez', 'Aqui'], answer: 'Não', explanation: '"Não" é a principal palavra que usamos para negar uma ação ou ideia.' },
+            { question: 'Na frase "Eu sempre estudo antes das provas", qual é o advérbio?', options: ['sempre', 'estudo', 'provas', 'antes'], answer: 'sempre', explanation: '"Sempre" indica a frequência (tempo) com que a pessoa estuda.' },
+            { question: 'O advérbio "talvez" indica:', options: ['Dúvida', 'Certeza', 'Tempo', 'Lugar'], answer: 'Dúvida', explanation: '"Talvez" expressa incerteza sobre se algo vai acontecer.' },
+            { question: 'Em "O cachorro latiu muito", a palavra "muito" é um advérbio de:', options: ['Intensidade', 'Modo', 'Lugar', 'Tempo'], answer: 'Intensidade', explanation: '"Muito" aumenta a intensidade do latido do cachorro.' },
+            { question: 'Qual frase contém um advérbio de modo?', options: ['A menina andava devagar.', 'O sol brilha hoje.', 'O livro está aqui.', 'Eu comi pouco.'], answer: 'A menina andava devagar.', explanation: '"Devagar" mostra o MODO como a menina andava.' },
+            { question: '"Ele certamente virá." A palavra "certamente" é um advérbio de:', options: ['Afirmação', 'Negação', 'Dúvida', 'Modo'], answer: 'Afirmação', explanation: '"Certamente" reforça a ideia, dando certeza à afirmação.' },
+            { question: 'Na frase "O gato está debaixo da mesa", qual palavra indica lugar?', options: ['debaixo', 'gato', 'mesa', 'está'], answer: 'debaixo', explanation: '"Debaixo" é uma locução adverbial que indica ONDE o gato está.' },
+            { question: '"Jamais farei isso novamente." A palavra "jamais" é um advérbio de:', options: ['Negação', 'Tempo', 'Modo', 'Dúvida'], answer: 'Negação', explanation: '"Jamais" é um advérbio forte que significa "nunca", indicando negação.' },
+            { question: 'Qual advérbio completa a frase "Ele correu __________ para pegar o ônibus"?', options: ['rapidamente', 'ontem', 'pouco', 'ali'], answer: 'rapidamente', explanation: '"Rapidamente" descreve o MODO como ele correu.' },
+            { question: 'Em "A flor é tão bonita", qual palavra é um advérbio de intensidade?', options: ['tão', 'flor', 'bonita', 'é'], answer: 'tão', explanation: '"Tão" intensifica o adjetivo "bonita", mostrando o grau da beleza.' },
+            { question: 'O advérbio "aqui" se refere a:', options: ['Lugar', 'Tempo', 'Modo', 'Afirmação'], answer: 'Lugar', explanation: '"Aqui" aponta para o LUGAR onde o falante está.' },
+            { question: '"Provavelmente choverá amanhã." Qual palavra indica dúvida?', options: ['Provavelmente', 'choverá', 'amanhã', '.'], answer: 'Provavelmente', explanation: '"Provavelmente" indica que há uma chance, mas não uma certeza, ou seja, uma dúvida.' },
+            { question: 'Na frase "Fale mais alto, por favor", o advérbio "mais" indica:', options: ['Intensidade', 'Modo', 'Lugar', 'Tempo'], answer: 'Intensidade', explanation: '"Mais" aumenta a intensidade do volume da fala.' },
+            { question: '"Realmente gostei do filme." A palavra "Realmente" é um advérbio de:', options: ['Afirmação', 'Negação', 'Modo', 'Dúvida'], answer: 'Afirmação', explanation: '"Realmente" confirma a ideia de ter gostado, sendo uma afirmação.' },
+            { question: 'Qual das opções é um advérbio de tempo?', options: ['Agora', 'Mal', 'Perto', 'Menos'], answer: 'Agora', explanation: '"Agora" indica o momento exato da ação, referindo-se ao tempo.' },
+            { question: 'Em "A tartaruga anda vagarosamente", qual palavra indica o modo como ela anda?', options: ['vagarosamente', 'tartaruga', 'anda', 'A'], answer: 'vagarosamente', explanation: '"Vagarosamente" descreve a MANEIRA, o modo como a tartaruga se move.' },
+            { question: '"O livro está aí, na sua frente." Qual palavra é um advérbio de lugar?', options: ['aí', 'livro', 'frente', 'sua'], answer: 'aí', explanation: '"Aí" indica a localização do livro, perto da pessoa com quem se fala.' },
+            { question: 'Qual advérbio de negação podemos usar na frase "Eu ____ vou à festa"?', options: ['não', 'sim', 'talvez', 'bem'], answer: 'não', explanation: 'A palavra "não" é usada para negar a ação de ir à festa.' },
+            { question: '"Ela estava bastante feliz." A palavra "bastante" indica:', options: ['Intensidade', 'Modo', 'Tempo', 'Lugar'], answer: 'Intensidade', explanation: '"Bastante" intensifica o quão feliz ela estava.' },
+            { question: 'Na frase "Antigamente, as cartas demoravam para chegar", qual é o advérbio de tempo?', options: ['Antigamente', 'cartas', 'demoravam', 'chegar'], answer: 'Antigamente', explanation: '"Antigamente" se refere a um tempo passado, indicando QUANDO a ação ocorria.' },
+            { question: 'Qual frase usa um advérbio de modo?', options: ['Ele agiu calmamente.', 'Eu moro longe.', 'Nós sairemos breve.', 'Talvez eu vá.'], answer: 'Ele agiu calmamente.', explanation: '"Calmamente" explica o MODO como ele agiu.' },
+            { question: '"O avião voa acima das nuvens." O advérbio "acima" é de:', options: ['Lugar', 'Modo', 'Tempo', 'Intensidade'], answer: 'Lugar', explanation: '"Acima" indica a posição do avião em relação às nuvens, ou seja, um lugar.' },
+            { question: 'Qual palavra indica afirmação?', options: ['Sim', 'Não', 'Acaso', 'Mal'], answer: 'Sim', explanation: '"Sim" é a palavra usada para confirmar ou afirmar algo.' },
+            { question: 'Em "A comida estava meio salgada", "meio" é um advérbio de:', options: ['Intensidade', 'Dúvida', 'Modo', 'Lugar'], answer: 'Intensidade', explanation: '"Meio" funciona como "um pouco", indicando a intensidade de quão salgada a comida estava.' },
+            { question: 'Na frase "Hoje não vou sair", qual palavra é o advérbio de tempo?', options: ['Hoje', 'não', 'vou', 'sair'], answer: 'Hoje', explanation: '"Hoje" especifica o dia em que a ação (ou a falta dela) acontece.' },
+            { question: 'Qual das alternativas contém um advérbio de dúvida?', options: ['Quiçá', 'Sempre', 'Dentro', 'Assim'], answer: 'Quiçá', explanation: '"Quiçá" é uma palavra menos comum que significa o mesmo que "talvez", expressando dúvida.' },
+            { question: '"O cachorro está fora da casa." O advérbio "fora" indica:', options: ['Lugar', 'Tempo', 'Negação', 'Modo'], answer: 'Lugar', explanation: '"Fora" indica a localização do cachorro, que está do lado de fora.' },
+            { question: 'Na frase "Ele fala pouco", a palavra "pouco" é um advérbio de:', options: ['Intensidade', 'Modo', 'Tempo', 'Negação'], answer: 'Intensidade', explanation: '"Pouco" indica a quantidade, a intensidade da fala.' },
+            { question: 'Qual advérbio completa a frase "Eu moro ________ da escola"?', options: ['perto', 'bem', 'nunca', 'demais'], answer: 'perto', explanation: '"Perto" é o advérbio que indica a localização em relação à escola.' },
+            { question: '"Ele chegou depois da hora." A palavra "depois" é um advérbio de:', options: ['Tempo', 'Lugar', 'Modo', 'Afirmação'], answer: 'Tempo', explanation: '"Depois" indica o momento em que ele chegou em relação a outro, sendo de tempo.' }
         ];
 
         // --- FUNÇÕES GERAIS E DE TELA ---
@@ -416,7 +418,7 @@
                     } else {
                         scoreTextEl.classList.remove('text-red-500');
                         if (duration > 0) {
-                            const potentialScore = (maxWatchedTime / duration) * 200;
+                            const potentialScore = (maxWatchedTime / duration) * 1000;
                             score = Math.floor(potentialScore / 10) * 10;
                         }
                     }
@@ -439,6 +441,13 @@
                 showScreen(gameScreen);
                 startGame();
             }
+        });
+
+        skipVideoBtn.addEventListener('click', () => {
+            score = 0;
+            updateScoreDisplay();
+            showScreen(gameScreen);
+            startGame();
         });
 
         // --- FUNÇÕES DE UI DO JOGO ---
@@ -474,7 +483,6 @@
         }
 
         function displayNextQuestion() {
-            // Se acabar as perguntas, embaralha de novo e continua
             if (currentQuestionIndex >= shuffledQuestions.length) {
                 currentQuestionIndex = 0;
                 shuffledQuestions = shuffleArray([...questions]);
@@ -497,24 +505,26 @@
 
         function handleAnswer(e) {
             const selectedOption = e.target.textContent;
-            const correctAnwer = shuffledQuestions[currentQuestionIndex].answer;
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const correctAnswer = currentQuestion.answer;
+            const explanation = currentQuestion.explanation;
 
             optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
 
-            if (selectedOption === correctAnwer) {
+            if (selectedOption === correctAnswer) {
                 score += 10;
-                showFeedback('Correto! 🎉', true);
+                showFeedback('Correto! 🎉', explanation, true);
                 e.target.classList.remove('bg-white', 'border-sky-300');
                 e.target.classList.add('bg-green-400', 'border-green-600', 'text-white');
             } else {
                 lives--;
-                showFeedback('Ops, não foi dessa vez! 🤔', false);
+                const wrongFeedbackMsg = `Ops! A resposta certa é "${correctAnswer}".`;
+                showFeedback(wrongFeedbackMsg, explanation, false);
                 e.target.classList.remove('bg-white', 'border-sky-300');
                 e.target.classList.add('bg-red-400', 'border-red-600', 'text-white');
                  if (lives <= 0) {
-                    // Atraso para o jogador ver o feedback antes da tela final
                     setTimeout(endGame, 1500);
-                    updateLivesDisplay(); // Atualiza para mostrar 0 vidas
+                    updateLivesDisplay();
                     return;
                 }
             }
@@ -526,21 +536,21 @@
             setTimeout(displayNextQuestion, 1500);
         }
 
-        function showFeedback(message, isCorrect) {
-            feedbackEl.textContent = message;
+        function showFeedback(message, explanation, isCorrect) {
+            feedbackEl.innerHTML = `<strong>${message}</strong><br><span class="text-lg sm:text-xl font-normal mt-2 block">${explanation}</span>`;
             feedbackEl.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 sm:p-8 rounded-2xl text-white text-2xl sm:text-3xl font-bold shadow-2xl opacity-0 pointer-events-none w-11/12 max-w-sm text-center ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`;
             feedbackEl.classList.remove('opacity-0');
             feedbackEl.style.transform = 'translate(-50%, -50%) scale(1)';
             setTimeout(() => {
                 feedbackEl.style.transform = 'translate(-50%, -50%) scale(0.5)';
                 feedbackEl.classList.add('opacity-0');
-            }, 1000);
+            }, 2500); // Aumentei o tempo para dar tempo de ler a explicação
         }
         
         function getMotivationalMessage(finalScore) {
-            if (finalScore >= 250) {
+            if (finalScore >= 1000) {
                 return "Excelente, " + loggedInUser.firstName + "! Você é um mestre dos advérbios! 🏆";
-            } else if (finalScore >= 150) {
+            } else if (finalScore >= 500) {
                 return "Muito bem, " + loggedInUser.firstName + "! Continue praticando para ficar ainda melhor. 👍";
             } else {
                 return "Não desista, " + loggedInUser.firstName + "! Cada tentativa é um passo para aprender mais. ✨";
